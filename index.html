@@ -24,9 +24,9 @@
         <button id="addPageBtn">Add Page</button>
         <button id="deletePageBtn">Delete Page</button>
         <button id="addTextBtn">Add Text</button>
-        <button id="zoomOutBtn">&#8722</button>
+        <button id="zoomOutBtn">-</button>
         <span id="zoomLabel">100%</span>
-        <button id="zoomInBtn">&#43</button>
+        <button id="zoomInBtn">+</button>
     </div>
 
     <button id="leftArrow" class="nav-arrow">⬅</button>
@@ -43,7 +43,6 @@
         <label>Edit Text</label><br>
         <textarea id="textEditBox" rows="2"></textarea>
         <br><br>
-        
         <label>Font Family</label>
         <select id="fontSelect">
             <option value="Arial">Arial</option>
@@ -81,11 +80,9 @@
             <option value="'Zen Dots', system-ui">Zen Dots</option>
         </select>
         <br><br>
-
         <label>Text Color</label>
         <input type="color" id="colorPicker">
         <br><br>
-
         <label>Text Effect</label>
         <select id="effectSelect">
             <option value="none">None</option>
@@ -95,17 +92,17 @@
             <option value="emboss">Emboss</option>
             <option value="multiShadow">Multiple Shadow</option>
         </select>
-        
         <div id="neonColorControls" class="effect-extra">
             <label>Neon Color</label>
             <input type="color" id="neonColorPicker" value="#ff00de">
         </div>
-
         <div id="multiShadowColorControls" class="effect-extra">
-            <label>Shadow Color A</label>
+            <label>Shadow Color 1</label>
             <input type="color" id="shadowAColorPicker" value="#ff00de">
-            <label>Shadow Color B</label>
+            <label>Shadow Color 2</label>
             <input type="color" id="shadowBColorPicker" value="#00d4ff">
+            <label>Shadow Color 3</label>
+            <input type="color" id="shadowCColorPicker" value="#39ff14">
         </div>
     </div>
 
