@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sticker Book</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Aldrich&family=Anybody:ital,wght@0,100..900;1,100..900&family=Big+Shoulders+Inline:opsz,wght@10..72,100..900&family=Changa+One:ital@0;1&family=Charm:wght@400;700&family=Charmonman:wght@400;700&family=Cookie&family=Doto:wght@100..900&family=Estonia&family=Gemunu+Libre:wght@200..800&family=Gowun+Dodum&family=Grape+Nuts&family=Hepta+Slab:wght@1..900&family=Lexend:wght@100..900&family=Lobster&family=Nanum+Gothic+Coding&family=Nova+Round&family=Oleo+Script+Swash+Caps:wght@400;700&family=Orbitron:wght@400..900&family=Playwrite+US+Modern:wght@100..400&family=Poiret+One&family=Press+Start+2P&family=Qwitcher+Grypen:wght@400;700&family=Rethink+Sans:ital,wght@0,400..800;1,400..800&family=Roboto:ital,wght@0,100..900;1,100..900&family=Send+Flowers&family=Sofia&family=Tourney:ital,wght@0,100..900;1,100..900&family=Train+One&family=Updock&family=Wallpoet&family=Zen+Dots&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="coverScreen">
+    <div class="coverContent">
+        <h1>My Sticker Book</h1>
+        <button id="openBookBtn">Open Book</button>
+    </div>
+</div>
+
+<div id="bookContainer">
+    <div class="topBar">
+        <button id="backBtn">Back to the Cover</button>
+        <p id="pageNumber"></p>
+        <button id="addPageBtn">Add Page</button>
+        <button id="deletePageBtn">Delete Page</button>
+        <button id="addTextBtn">Add Text</button>
+        <button id="zoomOutBtn">&#8722</button>
+        <span id="zoomLabel">100%</span>
+        <button id="zoomInBtn">&#43</button>
+    </div>
+
+    <button id="leftArrow" class="nav-arrow">⬅</button>
+    <div id="pageWrapper">
+        <div id="page"></div>
+    </div>
+    <button id="rightArrow" class="nav-arrow">➡</button>
+
+    <div class="uploadArea">
+        <input type="file" id="uploadSticker" accept="image/png,image/jpeg,image/webp">
+    </div>
+
+    <div id="fontPanel">
+        <label>Edit Text</label><br>
+        <textarea id="textEditBox" rows="2"></textarea>
+        <br><br>
+        
+        <label>Font Family</label>
+        <select id="fontSelect">
+            <option value="Arial">Arial</option>
+            <option value="'Aldrich', sans-serif">Aldrich</option>
+            <option value="'Anybody', sans-serif">Anybody</option>
+            <option value="'Big Shoulders Inline', sans-serif">Big Shoulders</option>
+            <option value="'Changa One', cursive">Changa One</option>
+            <option value="'Charm', cursive">Charm</option>
+            <option value="'Charmonman', cursive">Charmonman</option>
+            <option value="'Cookie', cursive">Cookie</option>
+            <option value="'Doto', sans-serif">Doto</option>
+            <option value="'Estonia', cursive">Estonia</option>
+            <option value="'Gemunu Libre', sans-serif">Gemunu Libre</option>
+            <option value="'Gowun Dodum', sans-serif">Gowun Dodum</option>
+            <option value="'Grape Nuts', cursive">Grape Nuts</option>
+            <option value="'Hepta Slab', serif">Hepta Slab</option>
+            <option value="'Lexend', sans-serif">Lexend</option>
+            <option value="'Lobster', cursive">Lobster</option>
+            <option value="'Nanum Gothic Coding', monospace">Nanum Gothic</option>
+            <option value="'Nova Round', system-ui">Nova Round</option>
+            <option value="'Oleo Script Swash Caps', system-ui">Oleo Script</option>
+            <option value="'Orbitron', sans-serif">Orbitron</option>
+            <option value="'Playwrite US Modern', cursive">Playwrite US</option>
+            <option value="'Poiret One', system-ui">Poiret One</option>
+            <option value="'Press Start 2P', cursive">Press Start 2P</option>
+            <option value="'Qwitcher Grypen', cursive">Qwitcher Grypen</option>
+            <option value="'Rethink Sans', sans-serif">Rethink Sans</option>
+            <option value="'Roboto', sans-serif">Roboto</option>
+            <option value="'Send Flowers', cursive">Send Flowers</option>
+            <option value="'Sofia', cursive">Sofia</option>
+            <option value="'Tourney', system-ui">Tourney</option>
+            <option value="'Train One', system-ui">Train One</option>
+            <option value="'Updock', cursive">Updock</option>
+            <option value="'Wallpoet', system-ui">Wallpoet</option>
+            <option value="'Zen Dots', system-ui">Zen Dots</option>
+        </select>
+        <br><br>
+
+        <label>Text Color</label>
+        <input type="color" id="colorPicker">
+        <br><br>
+
+        <label>Text Effect</label>
+        <select id="effectSelect">
+            <option value="none">None</option>
+            <option value="neon">Neon Glow</option>
+            <option value="fire">Fire Burst</option>
+            <option value="outline">Outline</option>
+            <option value="emboss">Emboss</option>
+            <option value="multiShadow">Multiple Shadow</option>
+        </select>
+        
+        <div id="neonColorControls" class="effect-extra">
+            <label>Neon Color</label>
+            <input type="color" id="neonColorPicker" value="#ff00de">
+        </div>
+
+        <div id="multiShadowColorControls" class="effect-extra">
+            <label>Shadow Color A</label>
+            <input type="color" id="shadowAColorPicker" value="#ff00de">
+            <label>Shadow Color B</label>
+            <input type="color" id="shadowBColorPicker" value="#00d4ff">
+        </div>
+    </div>
+
+    <div id="layerPanel">
+        <button id="frontBtn">Bring Front</button>
+        <button id="forwardBtn">Forward</button>
+        <button id="backwardBtn">Backward</button>
+        <button id="backBtnLayer">Send Back</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
