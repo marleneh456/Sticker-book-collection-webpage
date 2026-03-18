@@ -197,6 +197,16 @@ html, body{
 
 #fontSelect { width: 100%; padding: 5px; margin-top: 10px;}
 
+#colorPicker { width: 100%; margin-top: 10px; }
+
+#effectSelect { width: 100%; padding: 5px; margin-top: 10px; }
+
+#shadowAColorPicker, #shadowBColorPicker, #shadowCColorPicker {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
 /* Effect Extras Spacing */
 .effect-extra {
     margin-top: 15px;
@@ -285,6 +295,7 @@ html, body{
 
     #colorPicker{
         margin-top: 5px;
+        width: 90%;
         height: 20px;
     }
 
@@ -308,6 +319,9 @@ html, body{
     }
 
     #shadowAColorPicker, #shadowBColorPicker, #shadowCColorPicker {
+        margin-top: 5px;
+        margin-bottom: 5px;
+        width: 90%;
         height: 20px;
     }
 
@@ -315,7 +329,7 @@ html, body{
     margin-bottom:2px;
 }
 
-    #layerPanel { top: 460px;}
+    #layerPanel { top: 470px;}
     #layerPanel button{ display:block; margin:5px 0; width: 100%; padding: 5px; cursor: pointer; font-size: 8px;}
 
     .uploadArea{
