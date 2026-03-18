@@ -1,6 +1,6 @@
 // --- 1. IndexedDB System ---
 let db;
-const request = indexedDB.open("StickerBookDB", 30); // Incremented version for a fresh start
+const request = indexedDB.open("StickerBookDB", 30); 
 
 request.onupgradeneeded = (e) => {
     db = e.target.result;
@@ -43,6 +43,10 @@ const shadowBColorPicker = document.getElementById("shadowBColorPicker");
 const shadowCColorPicker = document.getElementById("shadowCColorPicker");
 const neonColorControls = document.getElementById("neonColorControls");
 const multiShadowColorControls = document.getElementById("multiShadowColorControls");
+
+// Zoom Buttons
+const zoomInBtn = document.getElementById("zoomInBtn");
+const zoomOutBtn = document.getElementById("zoomOutBtn");
 
 // --- 4. Database Functions ---
 function saveData() {
@@ -125,12 +129,11 @@ function renderPage() {
     updateArrows();
 }
 
-// --- 6. Effects Logic (The Fix) ---
+// --- 6. Effects Logic ---
 function applyEffectStyles(div, item) {
     div.style.textShadow = "none";
     div.style.webkitTextStroke = "0px transparent";
     
-    // Use saved colors or default to bright colors if they don't exist yet
     const nCol = item.effectColor || "#ff00de";
     const sA = item.shadowA || "#ff00de";
     const sB = item.shadowB || "#00d4ff";
@@ -149,7 +152,6 @@ function applyEffectStyles(div, item) {
     }
 }
 
-// Update the specific data in the array so it saves correctly
 function updateItemData(key, value) {
     if (selectedItem !== null) {
         pages[currentPage][selectedItem][key] = value;
@@ -194,7 +196,6 @@ function selectItem(index, div) {
         effectSelect.value = item.effect || "none";
         colorPicker.value = item.color;
         textEditBox.value = item.text;
-        // Sync effect pickers to saved values
         neonColorPicker.value = item.effectColor || "#ff00de";
         shadowAColorPicker.value = item.shadowA || "#ff00de";
         shadowBColorPicker.value = item.shadowB || "#00d4ff";
@@ -288,6 +289,20 @@ function updateZoom() {
     page.style.transform = `scale(${zoomLevel})`;
     zoomLabel.textContent = Math.round(zoomLevel * 100) + "%";
 }
+
+// ADDED: Zoom Button Logic
+zoomInBtn.addEventListener("pointerdown", () => {
+    zoomLevel = Math.min(zoomLevel + 0.1, 3);
+    updateZoom();
+    saveData();
+});
+
+zoomOutBtn.addEventListener("pointerdown", () => {
+    zoomLevel = Math.max(zoomLevel - 0.1, 0.5);
+    updateZoom();
+    saveData();
+});
+
 function updateArrows() {
     leftArrow.classList.toggle("disabled", currentPage === 0);
     rightArrow.classList.toggle("disabled", currentPage >= pages.length - 1);
