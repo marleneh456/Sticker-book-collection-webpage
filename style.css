@@ -320,7 +320,7 @@ html, body{
 
     .uploadArea{
         position:absolute;
-        bottom: 60px; 
+        bottom: 100px; 
         width:100%;
         text-align:center;
     }
