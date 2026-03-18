@@ -101,7 +101,8 @@ html, body{
     padding:10px;
     cursor:pointer;
     z-index:100;
-    color: #000;
+    color: #032fc0;
+    font-weight: bolder;
 }
 
 .nav-arrow.disabled { opacity: 0.1; pointer-events: none; }
