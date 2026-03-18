@@ -256,7 +256,7 @@ html, body{
     }
 
     .topBar button{
-        margin:0;
+        margin: 8px;
         width:120px;
         height:20px;
         font-size: 8px;
@@ -264,6 +264,11 @@ html, body{
 
     #zoomOutBtn, #zoomInBtn{
         font-size: 8px;
+        margin-top: 10px;
+    }
+
+    #resetPageBtn{
+        margin-right: 20px;
         margin-top: 10px;
     }
 

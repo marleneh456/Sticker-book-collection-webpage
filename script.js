@@ -36,6 +36,7 @@ const leftArrow = document.getElementById("leftArrow");
 const rightArrow = document.getElementById("rightArrow");
 const coverScreen = document.getElementById("coverScreen");
 const bookContainer = document.getElementById("bookContainer");
+const resetPageBtn = document.getElementById("resetPageBtn");
 
 const neonColorPicker = document.getElementById("neonColorPicker");
 const shadowAColorPicker = document.getElementById("shadowAColorPicker");
@@ -44,7 +45,6 @@ const shadowCColorPicker = document.getElementById("shadowCColorPicker");
 const neonColorControls = document.getElementById("neonColorControls");
 const multiShadowColorControls = document.getElementById("multiShadowColorControls");
 
-// Zoom Buttons
 const zoomInBtn = document.getElementById("zoomInBtn");
 const zoomOutBtn = document.getElementById("zoomOutBtn");
 
@@ -164,7 +164,7 @@ function updateItemData(key, value) {
     }
 }
 
-// --- 7. Event Listeners for Pickers ---
+// --- 7. Event Listeners ---
 colorPicker.oninput = (e) => updateItemData('color', e.target.value);
 neonColorPicker.oninput = (e) => updateItemData('effectColor', e.target.value);
 shadowAColorPicker.oninput = (e) => updateItemData('shadowA', e.target.value);
@@ -290,18 +290,27 @@ function updateZoom() {
     zoomLabel.textContent = Math.round(zoomLevel * 100) + "%";
 }
 
-// ADDED: Zoom Button Logic
-zoomInBtn.addEventListener("pointerdown", () => {
+zoomInBtn.onclick = () => {
     zoomLevel = Math.min(zoomLevel + 0.1, 3);
     updateZoom();
     saveData();
-});
+};
 
-zoomOutBtn.addEventListener("pointerdown", () => {
+zoomOutBtn.onclick = () => {
     zoomLevel = Math.max(zoomLevel - 0.1, 0.5);
     updateZoom();
     saveData();
-});
+};
+
+// RESET PAGE LOGIC (No Alert)
+resetPageBtn.onclick = () => {
+    pages[currentPage] = [];
+    selectedItem = null;
+    fontPanel.style.display = "none";
+    layerPanel.style.display = "none";
+    renderPage();
+    saveData();
+};
 
 function updateArrows() {
     leftArrow.classList.toggle("disabled", currentPage === 0);
