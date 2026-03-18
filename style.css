@@ -3,7 +3,7 @@
 }
 
 html, body{
-     margin: 0;
+    margin: 0;
     padding: 0;
     font-family:Arial;
     overflow:hidden;
@@ -129,6 +129,9 @@ html, body{
     border-radius:50%;
     display:none;
     cursor:pointer;
+    color: white !important;
+    text-shadow: none !important;
+    -webkit-text-stroke: 0px transparent !important;
 }
 
 .resizeHandle{
@@ -189,9 +192,9 @@ html, body{
 }
 
 #fontPanel { top:10px;}
-#textEditBox { width: 100%; resize: none; border: 1px solid #ccc; padding: 5px; box-sizing: border-box; }
+#textEditBox { width: 100%; resize: none; border: 1px solid #ccc; padding: 5px; box-sizing: border-box; margin-top: 10px;}
 
-#fontSelect { width: 100%; padding: 5px; }
+#fontSelect { width: 100%; padding: 5px; margin-top: 10px;}
 
 /* Effect Extras Spacing */
 .effect-extra {
@@ -228,3 +231,106 @@ html, body{
     padding: 10px;
     border-radius: 5px;
 }
+
+@media (max-width: 1300px) and (max-height: 2700px) {
+    html, body {
+        font-size: 10px;
+    }
+
+    .topBar{
+    position:absolute;
+    top:10px;
+    width:100%;
+    text-align:center;
+    }
+
+    .topBar button{
+        margin:0;
+        width:100px;
+        height:20px;
+        font-size: 10px;
+    }
+
+    #zoomOutBtn, #zoomInBtn{
+        font-size: 10px;
+        margin-top: 10px;
+    }
+
+    .nav-arrow {
+        font-size:20px;
+        padding:8px;
+        color: #000;
+    }
+
+    .rotateLabel{
+        font-size:10px;
+        padding:1px 4px;
+    }
+
+    #fontPanel, #layerPanel{
+        right:60px;
+        padding:5px;
+        border-radius:10px;
+        display:none;
+        z-index:5;
+        width: 98px;
+        opacity: 90%;
+        font-size: 10px;
+    }
+
+    #fontPanel { top:120px;}
+    #textEditBox { width: 90%; height: 20px; resize: none; border: 1px solid #ccc; padding: 5px; box-sizing: border-box; font-size: 10px;}
+
+    #fontSelect { width: 90%; padding: 5px; font-size: 10px;}
+
+    #colorPicker{
+        margin-top: 5px;
+        height: 20px;
+    }
+
+    #effectSelect{
+        margin-top: 5px;
+        width: 90%;
+        font-size: 10px;
+    }
+
+    /* Effect Extras Spacing */
+    .effect-extra {
+        margin-top: 5px;
+        border-top: 1px solid #eee;
+        display: none; /* Controlled by JS */
+    }
+
+    .effect-extra label {
+        font-size: 10px;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    #shadowAColorPicker, #shadowBColorPicker, #shadowCColorPicker {
+        height: 20px;
+    }
+
+    .effect-extra input {
+    margin-bottom:2px;
+}
+
+    #layerPanel { top: 460px;}
+    #layerPanel button{ display:block; margin:5px 0; width: 100%; padding: 5px; cursor: pointer; font-size: 10px;}
+
+    .uploadArea{
+        position:absolute;
+        bottom: 20px; 
+        width:100%;
+        text-align:center;
+    }
+
+    #uploadSticker {
+        font-size: 10px;
+        cursor: pointer;
+        background: white;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+}   
