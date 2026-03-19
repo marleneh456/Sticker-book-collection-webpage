@@ -243,6 +243,18 @@ html, body{
     border-radius: 5px;
 }
 
+#downloadPageBtn {
+    font-size: 13px;
+    cursor: pointer;
+    background: #146ed4;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bolder;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
 @media (max-width: 1300px) and (max-height: 2700px) {
     html, body {
         font-size: 8px;
@@ -352,4 +364,9 @@ html, body{
         border-radius: 5px;
     }
 
-}   
+    #downloadPageBtn {
+        font-size: 8px;
+        padding: 8px 12px;
+    }
+
+}

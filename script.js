@@ -47,6 +47,7 @@ const multiShadowColorControls = document.getElementById("multiShadowColorContro
 
 const zoomInBtn = document.getElementById("zoomInBtn");
 const zoomOutBtn = document.getElementById("zoomOutBtn");
+const downloadPageBtn = document.getElementById("downloadPageBtn");
 
 // --- 4. Database Functions ---
 function saveData() {
@@ -217,6 +218,18 @@ function enableDrag(div, index) {
         const moveDrag = (me) => {
             let x = (me.clientX - pageRect.left) / zoomLevel - offsetX;
             let y = (me.clientY - pageRect.top) / zoomLevel - offsetY;
+
+            // --- THE NEW BARRIER LOGIC ---
+            // Calculate height of top bar + 20px padding
+            let topBarHeight = document.querySelector('.topBar').offsetHeight;
+            let safeY = (topBarHeight + 20 - pageRect.top) / zoomLevel; 
+            
+            // Stop 'y' from going above the safe barrier zone
+            if (y < safeY) {
+                y = safeY;
+            }
+            // -----------------------------
+
             div.style.left = x + "px"; div.style.top = y + "px";
             pages[currentPage][index].x = x; pages[currentPage][index].y = y;
         };
@@ -321,7 +334,7 @@ function updateEffectUI(effect) {
     multiShadowColorControls.style.display = (effect === "multiShadow") ? "block" : "none";
 }
 
-// --- 10. Navigation & Buttons ---
+// --- 10. Navigation, Buttons, and Download ---
 fontSelect.onchange = () => { if(selectedItem!==null){ pages[currentPage][selectedItem].font=fontSelect.value; renderPage(); saveData(); }};
 effectSelect.onchange = () => { if(selectedItem!==null){ pages[currentPage][selectedItem].effect=effectSelect.value; updateEffectUI(effectSelect.value); renderPage(); saveData(); }};
 
@@ -337,6 +350,39 @@ uploadSticker.onchange = (e) => {
         renderPage(); saveData();
     };
     if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
+};
+
+// Download logic using html2canvas
+downloadPageBtn.onclick = () => {
+    // 1. Deselect any active item so selection borders/handles don't appear in the image
+    document.querySelectorAll(".item").forEach(i => i.classList.remove("selected"));
+    selectedItem = null;
+    fontPanel.style.display = "none";
+    layerPanel.style.display = "none";
+
+    // 2. Temporarily reset zoom to 1 to ensure a clean capture without clipping
+    const currentZoom = zoomLevel;
+    zoomLevel = 1.0;
+    updateZoom();
+
+    // 3. Give the DOM a tiny bit of time to apply the transform before taking the snapshot
+    setTimeout(() => {
+        html2canvas(page, {
+            backgroundColor: "#ffffff",
+            scale: 2, // Generates a higher resolution image
+            useCORS: true // Required if stickers come from external object URLs
+        }).then(canvas => {
+            // Create a temporary link and trigger the download
+            let link = document.createElement("a");
+            link.download = `Sticker-Page-${currentPage + 1}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+
+            // 4. Restore the original zoom
+            zoomLevel = currentZoom;
+            updateZoom();
+        });
+    }, 100);
 };
 
 leftArrow.onclick = () => {
