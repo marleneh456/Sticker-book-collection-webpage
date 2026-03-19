@@ -353,36 +353,40 @@ uploadSticker.onchange = (e) => {
 };
 
 // Download logic using html2canvas
-downloadPageBtn.onclick = () => {
-    // 1. Deselect any active item so selection borders/handles don't appear in the image
+downloadPageBtn.onclick = async () => {
+
+    // 1. Remove selection UI
     document.querySelectorAll(".item").forEach(i => i.classList.remove("selected"));
     selectedItem = null;
     fontPanel.style.display = "none";
     layerPanel.style.display = "none";
 
-    // 2. Temporarily reset zoom to 1 to ensure a clean capture without clipping
+    // 2. Save zoom and reset
     const currentZoom = zoomLevel;
     zoomLevel = 1.0;
     updateZoom();
 
-    // 3. Give the DOM a tiny bit of time to apply the transform before taking the snapshot
-    setTimeout(() => {
-        html2canvas(page, {
-            backgroundColor: "#ffffff",
-            scale: 2, // Generates a higher resolution image
-            useCORS: true // Required if stickers come from external object URLs
-        }).then(canvas => {
-            // Create a temporary link and trigger the download
-            let link = document.createElement("a");
-            link.download = `Sticker-Page-${currentPage + 1}.png`;
-            link.href = canvas.toDataURL("image/png");
-            link.click();
+    // 🔥 3. WAIT FOR FONTS TO LOAD (THIS IS THE FIX)
+    await document.fonts.ready;
 
-            // 4. Restore the original zoom
-            zoomLevel = currentZoom;
-            updateZoom();
-        });
-    }, 100);
+    // 4. Extra delay to ensure rendering is complete
+    await new Promise(res => setTimeout(res, 150));
+
+    // 5. Capture
+    html2canvas(page, {
+        backgroundColor: "#ffffff",
+        scale: 2,
+        useCORS: true
+    }).then(canvas => {
+        let link = document.createElement("a");
+        link.download = `Sticker-Page-${currentPage + 1}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+
+        // 6. Restore zoom
+        zoomLevel = currentZoom;
+        updateZoom();
+    });
 };
 
 leftArrow.onclick = () => {
