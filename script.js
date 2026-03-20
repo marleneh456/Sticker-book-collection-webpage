@@ -116,7 +116,9 @@ function renderPage() {
             div.style.fontSize = item.size + "px";
             div.style.color = item.color;
             applyEffectStyles(div, item);
-            div.innerHTML = `<span class="textContent">${item.text}</span>
+            
+            // Fix: Enforce the font-family directly inline on the span to guarantee html2canvas reads it
+            div.innerHTML = `<span class="textContent" style="font-family: ${item.font};">${item.text}</span>
                              <button class="deleteBtn">x</button>
                              <div class="resizeHandle"></div>
                              <div class="rotateHandle"></div>
@@ -229,12 +231,9 @@ function enableDrag(div, index) {
             let ny = (me.clientY - pageRect.top) / zoomLevel - offsetY;
 
             // --- REFINED BARRIER LOGIC ---
-            // Get the actual height of the topBar element dynamically
             const topBar = document.querySelector('.topBar');
             const TOP_BAR_HEIGHT = topBar ? topBar.offsetHeight : 70;
             
-            // Calculate where the "safe zone" starts relative to the internal page coordinates
-            // This prevents items from flying behind the header
             let barrierY = (TOP_BAR_HEIGHT - pageRect.top) / zoomLevel;
 
             if (ny < barrierY) {
@@ -370,6 +369,7 @@ uploadSticker.onchange = (e) => {
     if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
 };
 
+// Fix: Complete overhaul of the Download function for Font safety
 downloadPageBtn.onclick = async () => {
     document.querySelectorAll(".item").forEach(i => i.classList.remove("selected"));
     selectedItem = null;
@@ -378,21 +378,33 @@ downloadPageBtn.onclick = async () => {
 
     const currentZoom = zoomLevel;
     zoomLevel = 1.0;
-    updateZoom();
+    
+    // Explicitly remove transform for a clean CSS capture, rather than applying scale(1)
+    page.style.transform = "none"; 
 
     await document.fonts.ready;
-    await new Promise(res => setTimeout(res, 150));
+    // Increase timeout slightly to allow the DOM reflow to fully settle
+    await new Promise(res => setTimeout(res, 500)); 
 
     html2canvas(page, {
         backgroundColor: "#ffffff",
         scale: 2,
-        useCORS: true
+        useCORS: true,
+        onclone: (clonedDoc) => {
+            // Fix: Inject the font link directly into the cloned document used by html2canvas
+            // This forces GitHub Pages to respect the external stylesheet during capture
+            const fontLink = clonedDoc.createElement('link');
+            fontLink.rel = 'stylesheet';
+            fontLink.href = 'https://fonts.googleapis.com/css2?family=Aldrich&family=Anybody:ital,wght@0,100..900;1,100..900&family=Big+Shoulders+Inline:opsz,wght@10..72,100..900&family=Changa+One:ital@0;1&family=Charm:wght@400;700&family=Charmonman:wght@400;700&family=Cookie&family=Doto:wght@100..900&family=Estonia&family=Gemunu+Libre:wght@200..800&family=Gowun+Dodum&family=Grape+Nuts&family=Hepta+Slab:wght@1..900&family=Lexend:wght@100..900&family=Lobster&family=Nanum+Gothic+Coding&family=Nova+Round&family=Oleo+Script+Swash+Caps:wght@400;700&family=Orbitron:wght@400..900&family=Playwrite+US+Modern:wght@100..400&family=Poiret+One&family=Press+Start+2P&family=Qwitcher+Grypen:wght@400;700&family=Rethink+Sans:ital,wght@0,400..800;1,400..800&family=Roboto:ital,wght@0,100..900;1,100..900&family=Send+Flowers&family=Sofia&family=Tourney:ital,wght@0,100..900;1,100..900&family=Train+One&family=Updock&family=Wallpoet&family=Zen+Dots&display=swap';
+            clonedDoc.head.appendChild(fontLink);
+        }
     }).then(canvas => {
         let link = document.createElement("a");
         link.download = `Sticker-Page-${currentPage + 1}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
 
+        // Restore everything back to normal
         zoomLevel = currentZoom;
         updateZoom();
     });
@@ -431,11 +443,9 @@ page.onpointerdown = (e) => {
 };
 
 // --- Touch-Optimized Layering Logic ---
-
 const handleLayerChange = (action) => {
     if (selectedItem === null) return;
 
-    // Get the item and remove it from the current position
     const item = pages[currentPage].splice(selectedItem, 1)[0];
 
     if (action === "front") {
@@ -458,7 +468,6 @@ const handleLayerChange = (action) => {
     saveData();
 };
 
-// Use pointerdown for faster response on touch screens
 [
     { btn: frontBtn, action: "front" },
     { btn: forwardBtn, action: "forward" },
@@ -467,7 +476,7 @@ const handleLayerChange = (action) => {
 ].forEach(({ btn, action }) => {
     btn.onpointerdown = (e) => {
         e.preventDefault();
-        e.stopPropagation(); // Prevents the 'page.onpointerdown' from deselecting the item
+        e.stopPropagation(); 
         handleLayerChange(action);
     };
 });
