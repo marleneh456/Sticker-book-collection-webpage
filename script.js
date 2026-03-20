@@ -223,19 +223,11 @@ function enableDrag(div, index) {
             let nx = (me.clientX - pageRect.left) / zoomLevel - offsetX;
             let ny = (me.clientY - pageRect.top) / zoomLevel - offsetY;
 
-            // --- REFINED BARRIER LOGIC ---
-            // Get the actual height of the topBar element dynamically
             const topBar = document.querySelector('.topBar');
             const TOP_BAR_HEIGHT = topBar ? topBar.offsetHeight : 70;
-            
-            // Calculate where the "safe zone" starts relative to the internal page coordinates
-            // This prevents items from flying behind the header
             let barrierY = (TOP_BAR_HEIGHT - pageRect.top) / zoomLevel;
 
-            if (ny < barrierY) {
-                ny = barrierY; 
-            }
-            // -----------------------------
+            if (ny < barrierY) ny = barrierY; 
 
             div.style.left = nx + "px"; 
             div.style.top = ny + "px";
@@ -342,6 +334,7 @@ function updateArrows() {
     leftArrow.classList.toggle("disabled", currentPage === 0);
     rightArrow.classList.toggle("disabled", currentPage >= pages.length - 1);
 }
+
 function updateEffectUI(effect) {
     neonColorControls.style.display = (effect === "neon") ? "block" : "none";
     multiShadowColorControls.style.display = (effect === "multiShadow") ? "block" : "none";
@@ -365,29 +358,44 @@ uploadSticker.onchange = (e) => {
     if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
 };
 
+// UPDATED: Fixed Font Rendering in Download
 downloadPageBtn.onclick = async () => {
+    // 1. Clear UI clutter
     document.querySelectorAll(".item").forEach(i => i.classList.remove("selected"));
     selectedItem = null;
     fontPanel.style.display = "none";
     layerPanel.style.display = "none";
 
+    // 2. Reset zoom for high-quality capture
     const currentZoom = zoomLevel;
     zoomLevel = 1.0;
     updateZoom();
 
-    await document.fonts.ready;
-    await new Promise(res => setTimeout(res, 150));
+    // 3. FORCE FONT LOADING
+    // This waits for all CSS-linked fonts to be fully ready in the browser
+    try {
+        await document.fonts.ready;
+    } catch (err) {
+        console.warn("Font loading timed out, proceeding with capture.");
+    }
+
+    // 4. Final render cycle buffer
+    // Brief timeout ensures the browser has painted the font styles at 1.0 zoom
+    await new Promise(res => setTimeout(res, 250));
 
     html2canvas(page, {
         backgroundColor: "#ffffff",
-        scale: 2,
-        useCORS: true
+        scale: 2, // Export at 2x resolution
+        useCORS: true,
+        logging: false,
+        allowTaint: true
     }).then(canvas => {
         let link = document.createElement("a");
         link.download = `Sticker-Page-${currentPage + 1}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
 
+        // 5. Restore user's previous zoom
         zoomLevel = currentZoom;
         updateZoom();
     });
