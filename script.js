@@ -358,53 +358,59 @@ uploadSticker.onchange = (e) => {
     if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
 };
 
-// FIXED DOWNLOAD LOGIC
+// --- UPDATED DOWNLOAD LOGIC ---
 downloadPageBtn.onclick = async () => {
-    // 1. UI Cleanup
+    // 1. Deselect everything and hide panels
     document.querySelectorAll(".item").forEach(i => i.classList.remove("selected"));
     selectedItem = null;
     fontPanel.style.display = "none";
     layerPanel.style.display = "none";
 
-    // 2. Prepare for High-Res Capture
+    // 2. Temporarily set zoom to 1.0 for a clean capture
     const currentZoom = zoomLevel;
     zoomLevel = 1.0;
     updateZoom();
 
-    // 3. FORCE GITHUB/EXTERNAL FONTS TO LOAD
-    // We iterate through all text items and tell the browser to "load" that font explicitly
-    const fontPromises = pages[currentPage]
-        .filter(item => item.type === "text")
-        .map(item => document.fonts.load(`${item.size}px "${item.font}"`));
-
+    // 3. FORCE ALL FONTS TO LOAD
+    // On GitHub Pages, fonts are remote. We must wait for the document to be ready.
     try {
-        await Promise.all(fontPromises);
         await document.fonts.ready;
-        // Small extra delay for the browser to "paint" the fonts at the new zoom level
-        await new Promise(res => setTimeout(res, 500)); 
+        
+        // Extra check: Create a hidden span for every font currently on the page
+        // this forces the browser to actually "paint" the font once.
+        const fontsToLoad = [...new Set(pages[currentPage].filter(i => i.type === 'text').map(i => i.font))];
+        const loaderDiv = document.createElement('div');
+        loaderDiv.style.position = 'fixed';
+        loaderDiv.style.opacity = '0';
+        loaderDiv.style.pointerEvents = 'none';
+        fontsToLoad.forEach(f => {
+            const span = document.createElement('span');
+            span.style.fontFamily = f;
+            span.innerText = 'font-load-check';
+            loaderDiv.appendChild(span);
+        });
+        document.body.appendChild(loaderDiv);
+        
+        // Wait a small amount for the browser to process the hidden spans
+        await new Promise(res => setTimeout(res, 300));
+        document.body.removeChild(loaderDiv);
     } catch (err) {
-        console.error("Font loading failed:", err);
+        console.warn("Font loading wait failed, capture may use default fonts.", err);
     }
 
-    // 4. Capture Canvas
+    // 4. Capture with html2canvas
     html2canvas(page, {
         backgroundColor: "#ffffff",
-        scale: 2,
-        useCORS: true,       // Critical for GitHub/External fonts
-        allowTaint: false,    // Set to false to avoid security errors with CORS
+        scale: 2, // High DPI capture
+        useCORS: true, // Crucial for external fonts/images
         logging: false,
-        onclone: (clonedDoc) => {
-            // Ensure the cloned version of the page also has the correct styles
-            const clonedPage = clonedDoc.getElementById("page");
-            clonedPage.style.transform = "none";
-        }
     }).then(canvas => {
         let link = document.createElement("a");
         link.download = `Sticker-Page-${currentPage + 1}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
 
-        // 5. Restore User View
+        // 5. Restore original zoom level
         zoomLevel = currentZoom;
         updateZoom();
     });
