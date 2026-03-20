@@ -51,6 +51,11 @@ const zoomInBtn = document.getElementById("zoomInBtn");
 const zoomOutBtn = document.getElementById("zoomOutBtn");
 const downloadPageBtn = document.getElementById("downloadPageBtn");
 
+const frontBtn = document.getElementById("frontBtn");
+const forwardBtn = document.getElementById("forwardBtn");
+const backwardBtn = document.getElementById("backwardBtn");
+const backBtnLayer = document.getElementById("backBtnLayer");
+
 // --- 4. Database Functions ---
 function saveData() {
     if (!db) return;
@@ -424,3 +429,45 @@ page.onpointerdown = (e) => {
         fontPanel.style.display = "none"; layerPanel.style.display = "none"; selectedItem = null;
     }
 };
+
+// --- Touch-Optimized Layering Logic ---
+
+const handleLayerChange = (action) => {
+    if (selectedItem === null) return;
+
+    // Get the item and remove it from the current position
+    const item = pages[currentPage].splice(selectedItem, 1)[0];
+
+    if (action === "front") {
+        pages[currentPage].push(item);
+        selectedItem = pages[currentPage].length - 1;
+    } else if (action === "back") {
+        pages[currentPage].unshift(item);
+        selectedItem = 0;
+    } else if (action === "forward") {
+        const newIdx = Math.min(pages[currentPage].length, selectedItem + 1);
+        pages[currentPage].splice(newIdx, 0, item);
+        selectedItem = newIdx;
+    } else if (action === "backward") {
+        const newIdx = Math.max(0, selectedItem - 1);
+        pages[currentPage].splice(newIdx, 0, item);
+        selectedItem = newIdx;
+    }
+
+    renderPage();
+    saveData();
+};
+
+// Use pointerdown for faster response on touch screens
+[
+    { btn: frontBtn, action: "front" },
+    { btn: forwardBtn, action: "forward" },
+    { btn: backwardBtn, action: "backward" },
+    { btn: backBtnLayer, action: "back" }
+].forEach(({ btn, action }) => {
+    btn.onpointerdown = (e) => {
+        e.preventDefault();
+        e.stopPropagation(); // Prevents the 'page.onpointerdown' from deselecting the item
+        handleLayerChange(action);
+    };
+});
