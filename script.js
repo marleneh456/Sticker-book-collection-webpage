@@ -111,7 +111,7 @@ function renderPage() {
             div.style.fontSize = item.size + "px";
             div.style.color = item.color;
             applyEffectStyles(div, item);
-            div.innerHTML = `<span class="textContent" style="font-family: inherit;">${item.text}</span>
+            div.innerHTML = `<span class="textContent">${item.text}</span>
                              <button class="deleteBtn">x</button>
                              <div class="resizeHandle"></div>
                              <div class="rotateHandle"></div>
@@ -222,10 +222,21 @@ function enableDrag(div, index) {
         const moveDrag = (me) => {
             let nx = (me.clientX - pageRect.left) / zoomLevel - offsetX;
             let ny = (me.clientY - pageRect.top) / zoomLevel - offsetY;
+
+            // --- REFINED BARRIER LOGIC ---
+            // Get the actual height of the topBar element dynamically
             const topBar = document.querySelector('.topBar');
             const TOP_BAR_HEIGHT = topBar ? topBar.offsetHeight : 70;
+            
+            // Calculate where the "safe zone" starts relative to the internal page coordinates
+            // This prevents items from flying behind the header
             let barrierY = (TOP_BAR_HEIGHT - pageRect.top) / zoomLevel;
-            if (ny < barrierY) ny = barrierY; 
+
+            if (ny < barrierY) {
+                ny = barrierY; 
+            }
+            // -----------------------------
+
             div.style.left = nx + "px"; 
             div.style.top = ny + "px";
             pages[currentPage][index].x = nx; 
@@ -331,13 +342,12 @@ function updateArrows() {
     leftArrow.classList.toggle("disabled", currentPage === 0);
     rightArrow.classList.toggle("disabled", currentPage >= pages.length - 1);
 }
-
 function updateEffectUI(effect) {
     neonColorControls.style.display = (effect === "neon") ? "block" : "none";
     multiShadowColorControls.style.display = (effect === "multiShadow") ? "block" : "none";
 }
 
-// --- 10. Navigation and Buttons ---
+// --- 10. Navigation, Buttons, and Download ---
 fontSelect.onchange = () => { if(selectedItem!==null){ pages[currentPage][selectedItem].font=fontSelect.value; renderPage(); saveData(); }};
 effectSelect.onchange = () => { if(selectedItem!==null){ pages[currentPage][selectedItem].effect=effectSelect.value; updateEffectUI(effectSelect.value); renderPage(); saveData(); }};
 
@@ -355,9 +365,7 @@ uploadSticker.onchange = (e) => {
     if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
 };
 
-// --- FINAL FIXED DOWNLOAD LOGIC ---
 downloadPageBtn.onclick = async () => {
-    // 1. UI Preparation
     document.querySelectorAll(".item").forEach(i => i.classList.remove("selected"));
     selectedItem = null;
     fontPanel.style.display = "none";
@@ -367,36 +375,13 @@ downloadPageBtn.onclick = async () => {
     zoomLevel = 1.0;
     updateZoom();
 
-    // 2. Wait for Fonts API
-    try {
-        await document.fonts.ready;
-    } catch(e) {}
+    await document.fonts.ready;
+    await new Promise(res => setTimeout(res, 150));
 
-    // 3. The "Deep Clone" Fix
-    // We use the onclone option to manually set the computed font-family
-    // This bypasses html2canvas failing to find fonts in external CSS files.
     html2canvas(page, {
         backgroundColor: "#ffffff",
         scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        logging: false,
-        onclone: (clonedDoc) => {
-            // Find all text items in the secret clone that html2canvas uses
-            const clonedItems = clonedDoc.querySelectorAll(".textItem");
-            clonedItems.forEach((clonedDiv, idx) => {
-                const originalItem = pages[currentPage][idx];
-                if (originalItem && originalItem.type === "text") {
-                    // FORCE the font family style directly on the element
-                    clonedDiv.style.fontFamily = originalItem.font;
-                    const textSpan = clonedDiv.querySelector(".textContent");
-                    if (textSpan) textSpan.style.fontFamily = originalItem.font;
-                }
-                // Hide buttons and handles in the export
-                const buttons = clonedDiv.querySelectorAll("button, .resizeHandle, .rotateHandle, .rotateLabel");
-                buttons.forEach(b => b.style.display = "none");
-            });
-        }
+        useCORS: true
     }).then(canvas => {
         let link = document.createElement("a");
         link.download = `Sticker-Page-${currentPage + 1}.png`;
