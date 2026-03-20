@@ -16,6 +16,17 @@ request.onsuccess = (e) => {
     loadData(); 
 };
 
+const menuToggle = document.getElementById("menu-toggle");
+const topBar = document.querySelector(".topBar");
+
+// START CLOSED
+topBar.classList.add("collapsed");
+
+menuToggle.onclick = () => {
+    menuToggle.classList.toggle("open");
+    topBar.classList.toggle("collapsed");
+};
+
 // --- 2. App State ---
 let pages = [[]];
 let zoomLevel = 1.0;
