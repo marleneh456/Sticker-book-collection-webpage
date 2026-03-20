@@ -80,7 +80,7 @@ html, body{
     cursor: pointer;
 
     background-color: white;
-    border-radius: 10px;
+    border-radius: 50%;
     border: 6px solid #18aaff;
     box-shadow: 0 0 8px #18aaff;
 
@@ -344,6 +344,17 @@ html, body{
         height:20px;
         font-size: 8px;
     }
+
+    .menu-toggle {
+    width: 45px;
+    height: 45px;
+}
+
+/* Bars */
+.bar {
+    width: 22px;
+    height: 4px;
+}
 
     #zoomOutBtn, #zoomInBtn{
         font-size: 8px;
