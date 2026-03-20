@@ -1,3 +1,5 @@
+// script.js
+
 // --- 1. IndexedDB System ---
 let db;
 const request = indexedDB.open("StickerBookDB", 30); 
@@ -219,22 +221,26 @@ function enableDrag(div, index) {
             let x = (me.clientX - pageRect.left) / zoomLevel - offsetX;
             let y = (me.clientY - pageRect.top) / zoomLevel - offsetY;
 
-            // --- THE NEW BARRIER LOGIC ---
-            // Calculate height of top bar + 20px padding
-            let topBarHeight = document.querySelector('.topBar').offsetHeight;
-            let safeY = (topBarHeight + 20 - pageRect.top) / zoomLevel; 
+            // --- BARRIER LOGIC ---
+            // Set this to the height of your top bar in pixels.
+            const TOP_BAR_HEIGHT = 70; 
             
-            // Stop 'y' from going above the safe barrier zone
-            if (y < safeY) {
-                y = safeY;
+            // Note: We adjust by the page's position and zoom to keep it consistent
+            // If page starts exactly at the top of the screen, (TOP_BAR_HEIGHT / zoomLevel) is usually enough.
+            if (y < TOP_BAR_HEIGHT) {
+                y = TOP_BAR_HEIGHT; 
             }
-            // -----------------------------
+            // ---------------------
 
-            div.style.left = x + "px"; div.style.top = y + "px";
-            pages[currentPage][index].x = x; pages[currentPage][index].y = y;
+            div.style.left = x + "px"; 
+            div.style.top = y + "px";
+            pages[currentPage][index].x = x; 
+            pages[currentPage][index].y = y;
         };
+
         const endDrag = (me) => { 
-            div.style.zIndex = ""; div.releasePointerCapture(me.pointerId);
+            div.style.zIndex = ""; 
+            div.releasePointerCapture(me.pointerId);
             div.removeEventListener("pointermove", moveDrag);
             saveData(); 
         };
@@ -292,8 +298,11 @@ function enableRotate(div, index) {
 
 function enableDelete(div, index) {
     div.querySelector(".deleteBtn").onclick = (e) => { 
-        e.stopPropagation(); pages[currentPage].splice(index, 1); 
-        selectedItem = null; renderPage(); saveData();
+        e.stopPropagation(); 
+        pages[currentPage].splice(index, 1); 
+        selectedItem = null; 
+        renderPage(); 
+        saveData();
     };
 }
 
@@ -315,7 +324,6 @@ zoomOutBtn.onclick = () => {
     saveData();
 };
 
-// RESET PAGE LOGIC (No Alert)
 resetPageBtn.onclick = () => {
     pages[currentPage] = [];
     selectedItem = null;
@@ -352,27 +360,19 @@ uploadSticker.onchange = (e) => {
     if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
 };
 
-// Download logic using html2canvas
 downloadPageBtn.onclick = async () => {
-
-    // 1. Remove selection UI
     document.querySelectorAll(".item").forEach(i => i.classList.remove("selected"));
     selectedItem = null;
     fontPanel.style.display = "none";
     layerPanel.style.display = "none";
 
-    // 2. Save zoom and reset
     const currentZoom = zoomLevel;
     zoomLevel = 1.0;
     updateZoom();
 
-    // 🔥 3. WAIT FOR FONTS TO LOAD (THIS IS THE FIX)
     await document.fonts.ready;
-
-    // 4. Extra delay to ensure rendering is complete
     await new Promise(res => setTimeout(res, 150));
 
-    // 5. Capture
     html2canvas(page, {
         backgroundColor: "#ffffff",
         scale: 2,
@@ -383,7 +383,6 @@ downloadPageBtn.onclick = async () => {
         link.href = canvas.toDataURL("image/png");
         link.click();
 
-        // 6. Restore zoom
         zoomLevel = currentZoom;
         updateZoom();
     });
