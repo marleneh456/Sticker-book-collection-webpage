@@ -212,30 +212,35 @@ function enableDrag(div, index) {
         e.stopPropagation();
         selectItem(index, div); 
         div.style.zIndex = 1000;
+        
         let pageRect = page.getBoundingClientRect();
         let offsetX = (e.clientX - pageRect.left) / zoomLevel - pages[currentPage][index].x;
         let offsetY = (e.clientY - pageRect.top) / zoomLevel - pages[currentPage][index].y;
+        
         div.setPointerCapture(e.pointerId);
 
         const moveDrag = (me) => {
-            let x = (me.clientX - pageRect.left) / zoomLevel - offsetX;
-            let y = (me.clientY - pageRect.top) / zoomLevel - offsetY;
+            let nx = (me.clientX - pageRect.left) / zoomLevel - offsetX;
+            let ny = (me.clientY - pageRect.top) / zoomLevel - offsetY;
 
-            // --- BARRIER LOGIC ---
-            // Set this to the height of your top bar in pixels.
-            const TOP_BAR_HEIGHT = 70; 
+            // --- REFINED BARRIER LOGIC ---
+            // Get the actual height of the topBar element dynamically
+            const topBar = document.querySelector('.topBar');
+            const TOP_BAR_HEIGHT = topBar ? topBar.offsetHeight : 70;
             
-            // Note: We adjust by the page's position and zoom to keep it consistent
-            // If page starts exactly at the top of the screen, (TOP_BAR_HEIGHT / zoomLevel) is usually enough.
-            if (y < TOP_BAR_HEIGHT) {
-                y = TOP_BAR_HEIGHT; 
-            }
-            // ---------------------
+            // Calculate where the "safe zone" starts relative to the internal page coordinates
+            // This prevents items from flying behind the header
+            let barrierY = (TOP_BAR_HEIGHT - pageRect.top) / zoomLevel;
 
-            div.style.left = x + "px"; 
-            div.style.top = y + "px";
-            pages[currentPage][index].x = x; 
-            pages[currentPage][index].y = y;
+            if (ny < barrierY) {
+                ny = barrierY; 
+            }
+            // -----------------------------
+
+            div.style.left = nx + "px"; 
+            div.style.top = ny + "px";
+            pages[currentPage][index].x = nx; 
+            pages[currentPage][index].y = ny;
         };
 
         const endDrag = (me) => { 
