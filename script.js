@@ -360,57 +360,47 @@ uploadSticker.onchange = (e) => {
 
 // --- UPDATED DOWNLOAD LOGIC ---
 downloadPageBtn.onclick = async () => {
-    // 1. Deselect everything and hide panels
+    // 1. UI Cleanup
     document.querySelectorAll(".item").forEach(i => i.classList.remove("selected"));
     selectedItem = null;
     fontPanel.style.display = "none";
     layerPanel.style.display = "none";
 
-    // 2. Temporarily set zoom to 1.0 for a clean capture
+    // 2. Prep for capture
     const currentZoom = zoomLevel;
     zoomLevel = 1.0;
     updateZoom();
 
-    // 3. FORCE ALL FONTS TO LOAD
-    // On GitHub Pages, fonts are remote. We must wait for the document to be ready.
-    try {
-        await document.fonts.ready;
-        
-        // Extra check: Create a hidden span for every font currently on the page
-        // this forces the browser to actually "paint" the font once.
-        const fontsToLoad = [...new Set(pages[currentPage].filter(i => i.type === 'text').map(i => i.font))];
-        const loaderDiv = document.createElement('div');
-        loaderDiv.style.position = 'fixed';
-        loaderDiv.style.opacity = '0';
-        loaderDiv.style.pointerEvents = 'none';
-        fontsToLoad.forEach(f => {
-            const span = document.createElement('span');
-            span.style.fontFamily = f;
-            span.innerText = 'font-load-check';
-            loaderDiv.appendChild(span);
-        });
-        document.body.appendChild(loaderDiv);
-        
-        // Wait a small amount for the browser to process the hidden spans
-        await new Promise(res => setTimeout(res, 300));
-        document.body.removeChild(loaderDiv);
-    } catch (err) {
-        console.warn("Font loading wait failed, capture may use default fonts.", err);
-    }
-
-    // 4. Capture with html2canvas
+    // 3. Robust Capture Logic
     html2canvas(page, {
         backgroundColor: "#ffffff",
-        scale: 2, // High DPI capture
-        useCORS: true, // Crucial for external fonts/images
-        logging: false,
+        scale: 2,
+        useCORS: true,
+        allowTaint: false, // Set to false to force CORS usage
+        logging: true,     // Turn this on to see errors in the F12 console
+        onclone: (clonedDoc) => {
+            // This runs on a 'copy' of your page before the image is made
+            // We force every text item in the clone to explicitly declare its font
+            const clonedItems = clonedDoc.querySelectorAll(".textItem");
+            clonedItems.forEach((el, index) => {
+                const originalItem = pages[currentPage].filter(i => i.type === 'text')[index];
+                if (originalItem) {
+                    el.style.fontFamily = originalItem.font;
+                    // Force a layout refresh on the cloned element
+                    el.style.display = 'inline-block'; 
+                }
+            });
+        }
     }).then(canvas => {
         let link = document.createElement("a");
         link.download = `Sticker-Page-${currentPage + 1}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
 
-        // 5. Restore original zoom level
+        zoomLevel = currentZoom;
+        updateZoom();
+    }).catch(err => {
+        console.error("Download failed:", err);
         zoomLevel = currentZoom;
         updateZoom();
     });
