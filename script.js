@@ -358,44 +358,53 @@ uploadSticker.onchange = (e) => {
     if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
 };
 
-// UPDATED: Fixed Font Rendering in Download
+// FIXED DOWNLOAD LOGIC
 downloadPageBtn.onclick = async () => {
-    // 1. Clear UI clutter
+    // 1. UI Cleanup
     document.querySelectorAll(".item").forEach(i => i.classList.remove("selected"));
     selectedItem = null;
     fontPanel.style.display = "none";
     layerPanel.style.display = "none";
 
-    // 2. Reset zoom for high-quality capture
+    // 2. Prepare for High-Res Capture
     const currentZoom = zoomLevel;
     zoomLevel = 1.0;
     updateZoom();
 
-    // 3. FORCE FONT LOADING
-    // This waits for all CSS-linked fonts to be fully ready in the browser
+    // 3. FORCE GITHUB/EXTERNAL FONTS TO LOAD
+    // We iterate through all text items and tell the browser to "load" that font explicitly
+    const fontPromises = pages[currentPage]
+        .filter(item => item.type === "text")
+        .map(item => document.fonts.load(`${item.size}px "${item.font}"`));
+
     try {
+        await Promise.all(fontPromises);
         await document.fonts.ready;
+        // Small extra delay for the browser to "paint" the fonts at the new zoom level
+        await new Promise(res => setTimeout(res, 500)); 
     } catch (err) {
-        console.warn("Font loading timed out, proceeding with capture.");
+        console.error("Font loading failed:", err);
     }
 
-    // 4. Final render cycle buffer
-    // Brief timeout ensures the browser has painted the font styles at 1.0 zoom
-    await new Promise(res => setTimeout(res, 250));
-
+    // 4. Capture Canvas
     html2canvas(page, {
         backgroundColor: "#ffffff",
-        scale: 2, // Export at 2x resolution
-        useCORS: true,
+        scale: 2,
+        useCORS: true,       // Critical for GitHub/External fonts
+        allowTaint: false,    // Set to false to avoid security errors with CORS
         logging: false,
-        allowTaint: true
+        onclone: (clonedDoc) => {
+            // Ensure the cloned version of the page also has the correct styles
+            const clonedPage = clonedDoc.getElementById("page");
+            clonedPage.style.transform = "none";
+        }
     }).then(canvas => {
         let link = document.createElement("a");
         link.download = `Sticker-Page-${currentPage + 1}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
 
-        // 5. Restore user's previous zoom
+        // 5. Restore User View
         zoomLevel = currentZoom;
         updateZoom();
     });
