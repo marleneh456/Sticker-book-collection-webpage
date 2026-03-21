@@ -465,15 +465,7 @@ const handleLayerChange = (action) => {
     } else if (action === "back") {
         pages[currentPage].unshift(item);
         selectedItem = 0;
-    } else if (action === "forward") {
-        const newIdx = Math.min(pages[currentPage].length, selectedItem + 1);
-        pages[currentPage].splice(newIdx, 0, item);
-        selectedItem = newIdx;
-    } else if (action === "backward") {
-        const newIdx = Math.max(0, selectedItem - 1);
-        pages[currentPage].splice(newIdx, 0, item);
-        selectedItem = newIdx;
-    }
+    } 
 
     renderPage();
     saveData();
@@ -481,8 +473,6 @@ const handleLayerChange = (action) => {
 
 [
     { btn: frontBtn, action: "front" },
-    { btn: forwardBtn, action: "forward" },
-    { btn: backwardBtn, action: "backward" },
     { btn: backBtnLayer, action: "back" }
 ].forEach(({ btn, action }) => {
     btn.onpointerdown = (e) => {
