@@ -63,8 +63,6 @@ const zoomOutBtn = document.getElementById("zoomOutBtn");
 const downloadPageBtn = document.getElementById("downloadPageBtn");
 
 const frontBtn = document.getElementById("frontBtn");
-const forwardBtn = document.getElementById("forwardBtn");
-const backwardBtn = document.getElementById("backwardBtn");
 const backBtnLayer = document.getElementById("backBtnLayer");
 
 // --- 4. Database Functions ---
