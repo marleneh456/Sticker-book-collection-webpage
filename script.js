@@ -472,6 +472,7 @@ const handleLayerChange = (action) => {
 [
     { btn: frontBtn, action: "front" },
     { btn: backBtnLayer, action: "back" }
+    
 ].forEach(({ btn, action }) => {
     btn.onpointerdown = (e) => {
         e.preventDefault();
