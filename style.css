@@ -424,6 +424,16 @@ html, body{
         padding:1px 4px;
     }
 
+    .deleteBtn{
+    width:20px;
+    height:20px;
+}
+
+.resizeHandle{
+    width: 15px;
+    height: 15px;
+}
+
     #fontPanel, #layerPanel{
         right:60px;
         padding:5px;
