@@ -224,10 +224,10 @@ html, body{
 
 .deleteBtn{
     position:absolute;
-    top:-10px;
-    right:-10px;
-    width:20px;
-    height:20px;
+    top:-28px;
+    right:-28px;
+    width:40px;
+    height:40px;
     background:red;
     color:white;
     border:none;
@@ -241,8 +241,8 @@ html, body{
 
 .resizeHandle{
     position:absolute;
-    width:14px;
-    height:14px;
+    width: 20px;
+    height: 20px;
     background:#6b4cff;
     right:-7px;
     bottom:-7px;
