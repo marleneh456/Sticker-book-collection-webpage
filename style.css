@@ -435,7 +435,7 @@ html, body{
         font-size: 8px;
     }
 
-    #fontPanel { top:250px;}
+    #fontPanel { top:100px;}
     #textEditBox { width: 90%; height: 20px; resize: none; border: 1px solid #ccc; padding: 5px; box-sizing: border-box; font-size: 8px;}
 
     #fontSelect { width: 90%; padding: 5px; font-size: 8px;}

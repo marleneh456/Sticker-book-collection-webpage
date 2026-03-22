@@ -463,7 +463,7 @@ const handleLayerChange = (action) => {
     } else if (action === "back") {
         pages[currentPage].unshift(item);
         selectedItem = 0;
-    }
+    } 
 
     renderPage();
     saveData();
@@ -472,7 +472,6 @@ const handleLayerChange = (action) => {
 [
     { btn: frontBtn, action: "front" },
     { btn: backBtnLayer, action: "back" }
-
 ].forEach(({ btn, action }) => {
     btn.onpointerdown = (e) => {
         e.preventDefault();
